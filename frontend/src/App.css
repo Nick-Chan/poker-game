@@ -1,31 +1,84 @@
+/* General Body Styling */
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #2b2b2b;
-  color: white;
+  background-color: #1c1c1c; /* Darker background for a sleeker look */
+  color: #f1f1f1; /* Softer white for contrast */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
+/* Main App Container */
+.App {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #2b2b2b; /* Slightly lighter container background */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for elevation */
+}
+
+/* Button Styling */
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 18px;
-  margin: 20px;
+  margin: 20px 10px;
   background-color: #4caf50;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
   background-color: #45a049;
+  transform: scale(1.05); /* Slight zoom effect */
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+/* Disabled Button Styling */
+button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
-li {
-  font-size: 20px;
-  margin: 10px 0;
+/* Card Container */
+div.cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap; /* Wrap cards if the screen is too narrow */
+  margin-top: 20px;
+}
+
+/* Card Image Styling */
+img {
+  width: 120px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  transition: transform 0.2s ease, border 0.2s ease;
+  cursor: pointer;
+  box-sizing: border-box; /* Ensures border is included in the element's dimensions */
+}
+
+img:hover {
+  transform: scale(1.1); /* Slight zoom effect on hover */
+}
+
+img.selected {
+  border: 3px solid red; /* Highlight selected cards */
+  box-sizing: border-box; /* Maintains consistent size with the border */
+}
+
+/* Evaluation Styling */
+h3 {
+  margin-top: 20px;
+  font-size: 24px;
+  color: #ffa500; /* Orange color for emphasis */
 }
