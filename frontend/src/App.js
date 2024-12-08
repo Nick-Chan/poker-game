@@ -13,15 +13,24 @@ const getCardImage = (card) => {
 function App() {
     const [hand, setHand] = useState([]);
     const [evaluation, setEvaluation] = useState("");
+    const [money, setMoney] = useState(100); // Initialize money
+    const [freeRedealAvailable, setFreeRedealAvailable] = useState(true); // Track free re-deal status
     const [selectedCards, setSelectedCards] = useState([]); // Track selected cards
 
     // Fetch new cards from the backend
     const dealCards = () => {
         fetch("http://127.0.0.1:5000/api/deal")
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((err) => Promise.reject(err));
+                }
+                return response.json();
+            })
             .then((data) => {
                 setHand(data.hand || []);
                 setEvaluation(data.evaluation || "");
+                setMoney(data.money);
+                setFreeRedealAvailable(data.freeRedealAvailable);
                 setSelectedCards([]); // Reset selections after a new deal
             })
             .catch((error) => console.error("Error fetching cards:", error));
@@ -34,13 +43,35 @@ function App() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ selectedCards }),
         })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((err) => Promise.reject(err));
+                }
+                return response.json();
+            })
             .then((data) => {
                 setHand(data.hand || []);
                 setEvaluation(data.evaluation || "");
+                setMoney(data.money);
+                setFreeRedealAvailable(data.freeRedealAvailable);
                 setSelectedCards([]); // Reset selections after re-deal
             })
             .catch((error) => console.error("Error re-dealing cards:", error));
+    };
+
+    // Request payout
+    const payout = () => {
+        fetch("http://127.0.0.1:5000/api/payout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ evaluation }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setMoney(data.money);
+                alert(`You won $${data.payout}!`);
+            })
+            .catch((error) => console.error("Error processing payout:", error));
     };
 
     // Toggle card selection
@@ -55,13 +86,15 @@ function App() {
     return (
         <div className="App">
             <h1>Poker Game</h1>
-            <button onClick={dealCards}>Deal Cards</button>
+            <p>Money: ${money}</p>
+            <button onClick={dealCards}>Deal Cards (-$10)</button>
             <button
                 onClick={redealCards}
-                disabled={selectedCards.length === 0} // Disable if no cards are selected
+                disabled={!freeRedealAvailable || selectedCards.length === 0} // Disable if no cards are selected or no free re-deal
             >
-                Re-deal Selected Cards
+                Free Re-deal
             </button>
+            <button onClick={payout}>Payout</button>
             <div className="cards-container">
                 {hand.map((card, index) => (
                     <img

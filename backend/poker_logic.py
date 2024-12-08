@@ -5,6 +5,22 @@ from collections import Counter
 SUITS = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
 RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
 
+# Global betting counter
+STARTING_MONEY = 100
+
+# Payouts for hand evaluations
+PAYOUTS = {
+    "Straight Flush!": 50,
+    "Four of a Kind!": 25,
+    "Full House!": 15,
+    "Flush!": 10,
+    "Straight!": 8,
+    "Three of a Kind!": 5,
+    "Two Pair!": 3,
+    "Pair!": 1,
+    "High Card!": 0
+}
+
 # Generate a deck of cards
 def create_deck():
     return [f"{rank} of {suit}" for suit in SUITS for rank in RANKS]
@@ -85,22 +101,59 @@ def evaluate_hand(hand):
     else:
         return "High Card!"
 
-# Example: Main function to run logic
+# Main function
+def main():
+    global STARTING_MONEY
+    money = STARTING_MONEY
+    deck = shuffle_deck(create_deck())
+    free_redeal_used = False
+
+    print(f"Welcome to Poker! Starting money: ${money}")
+
+    while True:
+        if len(deck) < 5:  # Reshuffle if deck is too small
+            print("Shuffling the deck...")
+            deck = shuffle_deck(create_deck())
+            free_redeal_used = False
+
+        # Deal cards
+        print("\nDealing cards...")
+        if money >= 10:
+            money -= 10
+            hand, deck = deal_hand(deck)
+            print(f"Your hand: {hand}")
+        else:
+            print("Not enough money to deal cards. Game over!")
+            break
+
+        # Evaluate the hand
+        evaluation = evaluate_hand(hand)
+        print(f"Hand evaluation: {evaluation}")
+
+        # Payout for the hand
+        payout = PAYOUTS[evaluation]
+        money += payout
+        print(f"You win ${payout}. Current money: ${money}")
+
+        # Check if player wants to use the free redeal
+        if not free_redeal_used:
+            use_free_redeal = input("Would you like a free re-deal? (y/n): ").lower()
+            if use_free_redeal == "y":
+                free_redeal_used = True
+                selected_indices = [int(i) for i in input("Enter indices of cards to replace (e.g., 0 2 4): ").split()]
+                hand, deck = replace_selected_cards(hand, deck, selected_indices)
+                print(f"Your new hand: {hand}")
+                evaluation = evaluate_hand(hand)
+                print(f"New hand evaluation: {evaluation}")
+                payout = PAYOUTS[evaluation]
+                money += payout
+                print(f"You win ${payout}. Current money: ${money}")
+
+        # Ask if the player wants to continue
+        keep_playing = input("Do you want to keep playing? (y/n): ").lower()
+        if keep_playing != "y":
+            print(f"Game over! You finished with ${money}.")
+            break
+
 if __name__ == "__main__":
-    # Create and shuffle the deck
-    deck = create_deck()
-    shuffled_deck = shuffle_deck(deck)
-
-    # Deal an initial hand
-    hand, remaining_deck = deal_hand(shuffled_deck)
-    print("Player's initial hand:", hand)
-
-    # Replace some cards (example: replace the 1st and 3rd cards)
-    selected_indices = [0, 2]
-    hand, remaining_deck = replace_selected_cards(hand, remaining_deck, selected_indices)
-
-    print("Player's new hand:", hand)
-    print("Remaining deck size:", len(remaining_deck))
-
-    # Evaluate the hand
-    print("Hand evaluation:", evaluate_hand(hand))
+    main()
