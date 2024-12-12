@@ -15,6 +15,8 @@ function App() {
     const [evaluation, setEvaluation] = useState("");
     const [money, setMoney] = useState(100); // Initialize money
     const [freeRedealAvailable, setFreeRedealAvailable] = useState(true); // Track free re-deal status
+    const [payoutClaimed, setPayoutClaimed] = useState(false); // Track if payout has been claimed
+    const [payoutMessage, setPayoutMessage] = useState(""); // Payout message display
     const [selectedCards, setSelectedCards] = useState([]); // Track selected cards
 
     // Fetch new cards from the backend
@@ -30,7 +32,9 @@ function App() {
                 setHand(data.hand || []);
                 setEvaluation(data.evaluation || "");
                 setMoney(data.money);
-                setFreeRedealAvailable(data.freeRedealAvailable);
+                setFreeRedealAvailable(true); // Reset free re-deal
+                setPayoutClaimed(false); // Reset payout claim for the new deal
+                setPayoutMessage(""); // Clear payout message
                 setSelectedCards([]); // Reset selections after a new deal
             })
             .catch((error) => console.error("Error fetching cards:", error));
@@ -53,7 +57,7 @@ function App() {
                 setHand(data.hand || []);
                 setEvaluation(data.evaluation || "");
                 setMoney(data.money);
-                setFreeRedealAvailable(data.freeRedealAvailable);
+                setFreeRedealAvailable(false); // Mark free re-deal as used
                 setSelectedCards([]); // Reset selections after re-deal
             })
             .catch((error) => console.error("Error re-dealing cards:", error));
@@ -61,6 +65,11 @@ function App() {
 
     // Request payout
     const payout = () => {
+        if (payoutClaimed) {
+            console.error("Payout has already been claimed.");
+            return;
+        }
+
         fetch("http://127.0.0.1:5000/api/payout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -69,7 +78,8 @@ function App() {
             .then((response) => response.json())
             .then((data) => {
                 setMoney(data.money);
-                alert(`You won $${data.payout}!`);
+                setPayoutClaimed(true); // Mark payout as claimed
+                setPayoutMessage(`You won $${data.payout} from your bet! New total: $${data.money}`);
             })
             .catch((error) => console.error("Error processing payout:", error));
     };
@@ -88,13 +98,21 @@ function App() {
             <h1>Poker Game</h1>
             <p>Money: ${money}</p>
             <button onClick={dealCards}>Deal Cards (-$10)</button>
-            <button
-                onClick={redealCards}
-                disabled={!freeRedealAvailable || selectedCards.length === 0} // Disable if no cards are selected or no free re-deal
-            >
-                Free Re-deal
-            </button>
-            <button onClick={payout}>Payout</button>
+            <div>
+                <button
+                    onClick={redealCards}
+                    disabled={!freeRedealAvailable || selectedCards.length === 0} // Disable if no cards are selected or no free re-deal
+                >
+                    Free Re-deal
+                </button>
+                <button
+                    onClick={payout}
+                    disabled={payoutClaimed || evaluation === ""} // Disable if payout is already claimed or no evaluation yet
+                >
+                    Payout
+                </button>
+            </div>
+            <p className="payout-message">{payoutMessage}</p>
             <div className="cards-container">
                 {hand.map((card, index) => (
                     <img
