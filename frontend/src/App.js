@@ -13,62 +13,102 @@ function App() {
     const [evaluation, setEvaluation] = useState("");
     const [money, setMoney] = useState(100);
     const [freeRedealAvailable, setFreeRedealAvailable] = useState(true);
-    const [payoutClaimed, setPayoutClaimed] = useState(false);
+    const [payoutClaimed, setPayoutClaimed] = useState(true); // Start as true to allow the first deal
     const [payoutMessage, setPayoutMessage] = useState("");
     const [selectedCards, setSelectedCards] = useState([]);
 
     const dealCards = () => {
+        if (!payoutClaimed) {
+            console.error("Payout must be claimed before dealing a new hand.");
+            return;
+        }
+
         fetch("http://127.0.0.1:5000/api/deal")
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((err) => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then((data) => {
                 setHand(data.hand || []);
                 setEvaluation(data.evaluation || "");
                 setMoney(data.money);
-                setFreeRedealAvailable(true); // Reset free re-deal
-                setPayoutClaimed(false);
+                setFreeRedealAvailable(true);
+                setPayoutClaimed(false); // Disable deal button until payout is claimed
                 setPayoutMessage("");
                 setSelectedCards([]);
+                console.log("Deal successful:", data); // Debugging log
             })
-            .catch(error => console.error("Error fetching cards:", error));
+            .catch((error) => {
+                console.error("Error dealing cards:", error);
+            });
     };
 
     const redealCards = () => {
         fetch("http://127.0.0.1:5000/api/redeal", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ selectedCards })
+            body: JSON.stringify({ selectedCards }),
         })
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((err) => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
                 setHand(data.hand || []);
                 setEvaluation(data.evaluation || "");
                 setFreeRedealAvailable(data.freeRedealAvailable);
                 setSelectedCards([]);
+                console.log("Re-deal successful:", data); // Debugging log
             })
-            .catch(error => console.error("Error re-dealing cards:", error));
+            .catch((error) => {
+                console.error("Error re-dealing cards:", error);
+            });
     };
 
     const payout = () => {
-        if (payoutClaimed) return;
+        if (payoutClaimed) {
+            console.error("Payout already claimed.");
+            return;
+        }
 
         fetch("http://127.0.0.1:5000/api/payout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ evaluation })
+            body: JSON.stringify({ evaluation }),
         })
-            .then(response => response.json())
-            .then(data => {
-                setMoney(data.money);
-                setPayoutClaimed(true);
-                setPayoutMessage(`You won $${data.payout} from your bet! New total: $${data.money}`);
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((err) => Promise.reject(err));
+                }
+                return response.json();
             })
-            .catch(error => console.error("Error processing payout:", error));
+            .then((data) => {
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+                setMoney(data.money); // Update money with payout
+                setPayoutClaimed(true); // Allow deal button after payout
+                setPayoutMessage(`You won $${data.payout} from your bet! New total: $${data.money}`);
+                console.log("Payout successful:", data); // Debugging log
+            })
+            .catch((error) => {
+                console.error("Error processing payout:", error);
+            });
     };
 
     const toggleCardSelection = (index) => {
         setSelectedCards((prevSelected) =>
             prevSelected.includes(index)
-                ? prevSelected.filter(i => i !== index)
+                ? prevSelected.filter((i) => i !== index)
                 : [...prevSelected, index]
         );
     };
@@ -77,12 +117,20 @@ function App() {
         <div className="App">
             <h1>Poker Game</h1>
             <p>Money: ${money}</p>
-            <button onClick={dealCards}>Deal Cards (-$10)</button>
+            <button onClick={dealCards} disabled={!payoutClaimed}>
+                Deal Cards (-$10)
+            </button>
             <div>
-                <button onClick={redealCards} disabled={!freeRedealAvailable || selectedCards.length === 0}>
+                <button
+                    onClick={redealCards}
+                    disabled={!freeRedealAvailable || selectedCards.length === 0}
+                >
                     Free Re-deal
                 </button>
-                <button onClick={payout} disabled={payoutClaimed || evaluation === ""}>
+                <button
+                    onClick={payout}
+                    disabled={payoutClaimed || evaluation === ""}
+                >
                     Payout
                 </button>
             </div>
