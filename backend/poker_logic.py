@@ -10,15 +10,16 @@ STARTING_MONEY = 100
 
 # Payouts for hand evaluations
 PAYOUTS = {
-    "Straight Flush!": 50,
-    "Four of a Kind!": 25,
-    "Full House!": 15,
-    "Flush!": 10,
-    "Straight!": 8,
-    "Three of a Kind!": 5,
-    "Two Pair!": 3,
+    "Straight Flush!": 25,
+    "Four of a Kind!": 15,
+    "Full House!": 10,
+    "Flush!": 5,
+    "Straight!": 4,
+    "Three of a Kind!": 3,
+    "Two Pair!": 2,
     "Pair!": 1,
-    "High Card!": 0
+    "High Card!": 1,
+    "Loss!": 0
 }
 
 # Generate a deck of cards
@@ -56,6 +57,7 @@ def evaluate_hand(hand):
     """
     Evaluate the poker hand and return an evaluation.
     Includes logic for pair, triple, quads, full house, straight, and flush.
+    High Card only applies if the highest card is Ace or King.
     """
     # Split hand into ranks and suits
     ranks = [card.split(" ")[0] for card in hand]
@@ -99,61 +101,8 @@ def evaluate_hand(hand):
     elif 2 in rank_counts.values():
         return "Pair!"
     else:
-        return "High Card!"
-
-# Main function
-def main():
-    global STARTING_MONEY
-    money = STARTING_MONEY
-    deck = shuffle_deck(create_deck())
-    free_redeal_used = False
-
-    print(f"Welcome to Poker! Starting money: ${money}")
-
-    while True:
-        if len(deck) < 5:  # Reshuffle if deck is too small
-            print("Shuffling the deck...")
-            deck = shuffle_deck(create_deck())
-            free_redeal_used = False
-
-        # Deal cards
-        print("\nDealing cards...")
-        if money >= 10:
-            money -= 10
-            hand, deck = deal_hand(deck)
-            print(f"Your hand: {hand}")
+        # Check for High Card (Ace or King)
+        if "Ace" in ranks or "King" in ranks:
+            return "High Card!"
         else:
-            print("Not enough money to deal cards. Game over!")
-            break
-
-        # Evaluate the hand
-        evaluation = evaluate_hand(hand)
-        print(f"Hand evaluation: {evaluation}")
-
-        # Payout for the hand
-        payout = PAYOUTS[evaluation]
-        money += payout
-        print(f"You win ${payout}. Current money: ${money}")
-
-        # Check if player wants to use the free redeal
-        if not free_redeal_used:
-            use_free_redeal = input("Would you like a free re-deal? (y/n): ").lower()
-            if use_free_redeal == "y":
-                free_redeal_used = True
-                selected_indices = [int(i) for i in input("Enter indices of cards to replace (e.g., 0 2 4): ").split()]
-                hand, deck = replace_selected_cards(hand, deck, selected_indices)
-                print(f"Your new hand: {hand}")
-                evaluation = evaluate_hand(hand)
-                print(f"New hand evaluation: {evaluation}")
-                payout = PAYOUTS[evaluation]
-                money += payout
-                print(f"You win ${payout}. Current money: ${money}")
-
-        # Ask if the player wants to continue
-        keep_playing = input("Do you want to keep playing? (y/n): ").lower()
-        if keep_playing != "y":
-            print(f"Game over! You finished with ${money}.")
-            break
-
-if __name__ == "__main__":
-    main()
+            return "Loss!"

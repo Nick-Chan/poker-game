@@ -88,20 +88,21 @@ def payout():
     data = request.get_json()
     evaluation = data.get("evaluation", "")
     multipliers = {
-        "Straight Flush!": 5,
-        "Four of a Kind!": 4,
-        "Full House!": 3.5,
-        "Flush!": 3,
-        "Straight!": 2.5,
-        "Three of a Kind!": 2,
-        "Two Pair!": 1.5,
-        "Pair!": 1.2,
-        "High Card!": 1
+        "Straight Flush!": 25,
+        "Four of a Kind!": 15,
+        "Full House!": 10,
+        "Flush!": 5,
+        "Straight!": 4,
+        "Three of a Kind!": 3,
+        "Two Pair!": 2,
+        "Pair!": 1,
+        "High Card!": 1,
+        "Loss!": 0
     }
 
     if evaluation not in multipliers:
         return jsonify({"error": "Invalid evaluation for payout."}), 400
-
+    
     multiplier = multipliers[evaluation]
     payout_amount = int(10 * multiplier)  # Based on $10 bet
     money += payout_amount

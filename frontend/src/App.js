@@ -36,7 +36,7 @@ function App() {
                 setMoney(data.money);
                 setFreeRedealAvailable(true);
                 setPayoutClaimed(false); // Disable deal button until payout is claimed
-                setPayoutMessage("");
+                setPayoutMessage("Select cards to a re-deal, or click payout to end the turn!");
                 setSelectedCards([]);
                 console.log("Deal successful:", data); // Debugging log
             })
