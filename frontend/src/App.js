@@ -115,6 +115,27 @@ function App() {
 
     return (
         <div className="App">
+                {/* Payout Info Icon */}
+            <div className="payout-info" title="View payouts">
+                ?
+                <div className="tooltip">
+                <p><strong>Payouts:</strong></p>
+                <ul style={{ listStyleType: "none", padding: 0 }}>
+                    <li>Straight Flush: 25x</li>
+                    <li>Four of a Kind: 15x</li>
+                    <li>Full House: 10x</li>
+                    <li>Flush: 5x</li>
+                    <li>Straight: 4x</li>
+                    <li>Three of a Kind: 3x</li>
+                    <li>Two Pair: 2x</li>
+                    <li>Pair: 1x</li>
+                    <li>High Card (A or K): 1x</li>
+                    <li>Anything else: 0x</li>
+                </ul>
+                </div>
+            </div>
+            
+            {/* Game content */}
             <h1>Poker Game</h1>
             <p>Money: ${money}</p>
             <button onClick={dealCards} disabled={!payoutClaimed}>
