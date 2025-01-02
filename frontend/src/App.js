@@ -62,11 +62,14 @@ function App() {
                     console.error(data.error);
                     return;
                 }
+                // Update the hand and evaluation after re-deal
                 setHand(data.hand || []);
                 setEvaluation(data.evaluation || "");
                 setFreeRedealAvailable(data.freeRedealAvailable);
                 setSelectedCards([]);
-                console.log("Re-deal successful:", data); // Debugging log
+
+                // Automatically initiate payout
+                payoutAfterRedeal(data.evaluation);      
             })
             .catch((error) => {
                 console.error("Error re-dealing cards:", error);
@@ -102,6 +105,30 @@ function App() {
             })
             .catch((error) => {
                 console.error("Error processing payout:", error);
+            });
+    };
+
+    const payoutAfterRedeal = (evaluation) => {
+        fetch("http://127.0.0.1:5000/api/payout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ evaluation }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+    
+                // Update money and payout message
+                setMoney(data.money);
+                setPayoutClaimed(true); // Allow deal button after payout
+                setPayoutMessage(`You won $${data.payout} from your re-deal! New total: $${data.money}`);
+                console.log("Payout successful after re-deal:", data);
+            })
+            .catch((error) => {
+                console.error("Error processing payout after re-deal:", error);
             });
     };
 
