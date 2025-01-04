@@ -156,7 +156,7 @@ function App() {
                     <li>Three of a Kind: 3x</li>
                     <li>Two Pair: 2x</li>
                     <li>Pair: 1x</li>
-                    <li>High Card (A or K): 1x</li>
+                    <li>High Card (Ace): 1x</li>
                     <li>Anything else: 0x</li>
                 </ul>
                 </div>

@@ -102,7 +102,7 @@ def evaluate_hand(hand):
         return "Pair!"
     else:
         # Check for High Card (Ace or King)
-        if "Ace" in ranks or "King" in ranks:
+        if "Ace" in ranks:
             return "High Card!"
         else:
             return "Loss!"
