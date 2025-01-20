@@ -6,11 +6,11 @@ app = Flask(__name__)
 CORS(app)
 
 # Game state
-deck = shuffle_deck(create_deck())  # Initialize the deck
-hand = []  # Store the current hand globally
-money = 100  # Starting money
-free_redeal_used = False  # Free re-deal flag
-payout_claimed = True  # Start as true to allow the first deal
+deck = shuffle_deck(create_deck())
+hand = []
+money = 100
+free_redeal_used = False 
+payout_claimed = True
 
 
 @app.route('/api/deal', methods=['GET'])
@@ -104,7 +104,7 @@ def payout():
         return jsonify({"error": "Invalid evaluation for payout."}), 400
     
     multiplier = multipliers[evaluation]
-    payout_amount = int(10 * multiplier)  # Based on $10 bet
+    payout_amount = int(10 * multiplier)
     money += payout_amount
     payout_claimed = True
 

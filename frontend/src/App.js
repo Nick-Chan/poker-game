@@ -13,7 +13,7 @@ function App() {
     const [evaluation, setEvaluation] = useState("");
     const [money, setMoney] = useState(100);
     const [freeRedealAvailable, setFreeRedealAvailable] = useState(true);
-    const [payoutClaimed, setPayoutClaimed] = useState(true); // Start as true to allow the first deal
+    const [payoutClaimed, setPayoutClaimed] = useState(true);
     const [payoutMessage, setPayoutMessage] = useState("");
     const [selectedCards, setSelectedCards] = useState([]);
 

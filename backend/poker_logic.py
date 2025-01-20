@@ -44,11 +44,11 @@ def replace_selected_cards(hand, deck, selected_indices):
     Replace cards in `hand` at `selected_indices` with new cards from `deck`.
     Update the deck to reflect the removed cards.
     """
-    new_cards = deck[:len(selected_indices)]  # Take as many new cards as needed
+    new_cards = deck[:len(selected_indices)]
     remaining_deck = deck[len(selected_indices):]
 
     for i, index in enumerate(selected_indices):
-        hand[index] = new_cards[i]  # Replace the selected cards with new cards
+        hand[index] = new_cards[i]
 
     return hand, remaining_deck
 
